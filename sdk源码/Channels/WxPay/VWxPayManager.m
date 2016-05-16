@@ -61,7 +61,7 @@ static VPayCompletion payCompletion;
 
 - (void)handleOpenURL:(NSURL *)url withCompletion:(VPayCompletion)completion
 {
-    [WXApi handleOpenURL:url delegate:self];
+    [WXApi handleOpenURL:url delegate:[VWxPayManager manager]];
     
     openCompletion = completion;
 }
@@ -69,9 +69,10 @@ static VPayCompletion payCompletion;
 #pragma mark -- 微信的回调信息
 - (void)onResp:(BaseResp *)resp
 {
-    VPayResultStatus status = 0;
-    NSString *msg;
+   
     if ([resp isKindOfClass:[PayResp class]]) {
+        VPayResultStatus status = 0;
+        NSString *msg;
         //支付返回结果，实际支付结果需要去微信服务器端查询
         switch (resp.errCode) {
             case 0:
@@ -91,7 +92,9 @@ static VPayCompletion payCompletion;
                 msg   = @"微信支付失败";
                 break;
                 
+                
      }
+        
         if (payCompletion) {
             payCompletion(status,msg);
         }
@@ -99,7 +102,8 @@ static VPayCompletion payCompletion;
         if (openCompletion) {
             openCompletion(status,msg);
         }
-  }
-    
+
+}
+        
 }
 @end

@@ -3,7 +3,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "VPay"
-  s.version      = "0.0.3"
+  s.version      = "0.0.4"
   s.summary      = "this is  a pay components."
 
   s.description  = <<-DESC

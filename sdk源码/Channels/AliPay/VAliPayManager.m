@@ -11,6 +11,9 @@
 #import <AlipaySDK/AlipaySDK.h>
 #import <AlipaySDK/APayAuthInfo.h>
 #import "VPayTool.h"
+
+static VPayCompletion payCompletion;
+static VPayCompletion returnCompletion;
 static VAliPayManager *manager;
 
 @implementation VAliPayManager
@@ -41,25 +44,29 @@ static VAliPayManager *manager;
     }
     __weak typeof(self) wSelf = self;
 
+    payCompletion = completion;
     [[AlipaySDK defaultService] payOrder:sign fromScheme:scheme callback:^(NSDictionary *resultDic) {
         
-        [wSelf handleResult:resultDic withCompletion:completion];
+        [wSelf handleResult:resultDic];
     }];
 }
 
 - (void)handleOpenURL:(NSURL *)url withCompletion:(VPayCompletion)completion
 {
     __weak typeof(self) wSelf = self;
+    returnCompletion = completion;
+
     [[AlipaySDK defaultService] processOrderWithPaymentResult:url standbyCallback:^(NSDictionary *resultDic) {
         if (!wSelf) {
             return ;
         }
-        [wSelf handleResult:resultDic withCompletion:completion];
+        [wSelf handleResult:resultDic];
         
     }];
+    
 }
 
-- (void)handleResult:(NSDictionary *)resultDic withCompletion:(VPayCompletion)completion {
+- (void)handleResult:(NSDictionary *)resultDic {
     
     VPayResultStatus status = 0;
     NSString * msg;
@@ -90,8 +97,13 @@ static VAliPayManager *manager;
      8000 支付结果待确认
      --  失败
      */
-    if (completion) {
-        completion(status,msg);
+    
+    if (payCompletion) {
+        payCompletion(status,msg);
+    }
+    
+    if (returnCompletion) {
+        returnCompletion(status,msg);
     }
     
 }

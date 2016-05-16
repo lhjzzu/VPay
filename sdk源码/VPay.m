@@ -58,7 +58,7 @@ static NSString *wxPay_scheme = nil;
             return;
         }
         
-        wxPay_scheme = scheme;
+        wxPay_scheme = appId;
         [[payClass manager] wxPayWithOrderDic:orderDic  withCompletion:completion];
     } else if (type == VPAYTYPE_UNION) {
         
